@@ -65,8 +65,7 @@ def ceilometer_algorithm(ceil_path, met_path, ceil_clr_file, output_csv='output.
         wind_thres:
             Threshold 10 m wind speed (m/s) for BLSN detection (default = 3.0).
         vis_thres:
-            Threshold 2 m visibility (m) — included for compatibility but not used
-            in the current version (default = 10000.).
+            Threshold 2 m visibility (m) —  (default = 10000.).
         rh_thres:
             Relative humidity threshold (%) for distinguishing fog (default = 90.0).
 
@@ -101,7 +100,7 @@ def ceilometer_algorithm(ceil_path, met_path, ceil_clr_file, output_csv='output.
         '2m_rel_hum'
             Averaged 2 m relative humidity (%).
         '2m_visibility'
-            Averaged 2 m visibility (m); included for completeness.
+            Averaged 2 m visibility (m); 
 
     Missing‑value code:
         99999999.9
@@ -184,16 +183,15 @@ def ceilometer_algorithm(ceil_path, met_path, ceil_clr_file, output_csv='output.
                     crit1 = int(profiles_ceil[ii, 1] > np.nanmean(profiles_ceil[ii, 2:7]))
                     crit2 = int(profiles_ceil[ii, 1] > ceil_clr[1])
                 
-                crit3 = int(wind_avg[ii] > wind_thres) if not np.isnan(wind_avg[ii]) else 0
-                crit4 = 1  # visibility criterion deactivated (no visibility data)
-                crit5 = int(rh_avg[ii] < rh_thres) if not np.isnan(rh_avg[ii]) else 0
+                crit3 = int(wind_avg[ii] > wind_thres) if not np.isnan(wind_avg[ii]) else 0 # check that wind speed > threshold speed 
+                crit4 = int(vis_avg[ii] < vis_thres) # check that visibility < visibility threshold 
+                crit5 = int(rh_avg[ii] < rh_thres) if not np.isnan(rh_avg[ii]) else 0 # check that RH < RH threshold
 
                 # BLSN detection - assignment of category and height
                 if crit1 + crit2 + crit3 + crit4 + crit5 == 5:
                     idx = 1
                     local_min = profiles_ceil[ii, 1]
                     local_min_idx = 1
-                    # window and precip_jump_factor are now function arguments (tunable)
 
                     while idx < len(height) - 2:
 
